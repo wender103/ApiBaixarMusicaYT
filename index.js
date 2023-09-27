@@ -36,7 +36,7 @@ function formatarTexto(texto) {
   return texto
 }
 
-app.post('/getVideoInfo', async (req, res) => {
+app.post('/', async (req, res) => {
   try {
     const videoURL = req.body.videoURL
     const audioOptions = {
