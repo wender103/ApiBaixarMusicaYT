@@ -76,6 +76,9 @@ app.post('/', async (req, res) => {
     res.json(videoInfo)
   } catch (err) {
     console.error('Erro ao obter informações do vídeo:', err.message);
+    if (err.message.includes('Status code: 410')) {
+      console.error('O vídeo não está mais disponível ou foi removido.');
+    }
     res.status(500).json({ error: 'Erro ao obter informações do vídeo', message: err.message });
   }
 })
