@@ -38,6 +38,8 @@ function formatarTexto(texto) {
 
 app.post('/', async (req, res) => {
   try {
+    console.log('Dentro do try app.post');
+
     const videoURL = req.body.videoURL
     const audioOptions = {
       filter: 'audioonly'
@@ -73,13 +75,16 @@ app.post('/', async (req, res) => {
       uid: uid
     }
 
+    console.log('InfosVideo');
+    console.log(videoInfo);
+
     res.json(videoInfo)
   } catch (err) {
-    console.error('Erro ao obter informações do vídeo:', err.message);
+    console.error('Erro ao obter informações do vídeo:', err);
     if (err.message.includes('Status code: 410')) {
       console.error('O vídeo não está mais disponível ou foi removido.');
     }
-    res.status(500).json({ error: 'Erro ao obter informações do vídeo', message: err.message });
+    res.status(500).json({ error: 'Erro ao obter informações do vídeo', message: err });
   }
 })
 
@@ -148,7 +153,7 @@ async function addHighResThumbnailToAudio(audioUrl, videoTitle, channelName, aud
     response.data.pipe(tempThumbnailStream)
 
     const cmd = `ffmpeg -i "${tempAudioPath}" -i "${tempThumbnailPath}" -map 0 -map 1 -c copy -disposition:1 attached_pic -y "${tempAudioPath}_temp"`
-    await exec(cmd)
+    exec(cmd)
 
     await bucket.upload(`${tempAudioPath}_temp`, { destination: audioPath, metadata: { contentType: 'audio/mpeg' } })
 
