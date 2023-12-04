@@ -120,7 +120,7 @@ async function downloadThumbnailToFirebase(videoURL, bucket, filename) {
       })
       .on('error', (err) => console.error('Erro ao enviar a capa do vídeo:', err))
   } catch (err) {
-    // throw err
+    console.log(err);
   }
 }
 
@@ -128,7 +128,7 @@ async function getVideoThumbnailURL(videoURL, quality) {
   try {
     return `https://img.youtube.com/vi/${ytdl.getVideoID(videoURL)}/${quality}.jpg`
   } catch (err) {
-    // throw err
+    console.log(err);
   }
 }
 
@@ -153,7 +153,7 @@ async function addHighResThumbnailToAudio(audioUrl, videoTitle, channelName, aud
     fs.unlinkSync(tempThumbnailPath)
     fs.unlinkSync(`${tempAudioPath}_temp`)
   } catch (err) {
-    // throw err
+    console.log(err);
   }
 }
 
