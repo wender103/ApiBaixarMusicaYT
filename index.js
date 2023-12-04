@@ -75,8 +75,8 @@ app.post('/', async (req, res) => {
 
     res.json(videoInfo)
   } catch (err) {
-    console.error('Erro ao obter informações do vídeo:', err)
-    res.status(500).json({ error: 'Erro ao obter informações do vídeo' })
+    console.error('Erro ao obter informações do vídeo:', err.message);
+    res.status(500).json({ error: 'Erro ao obter informações do vídeo', message: err.message });
   }
 })
 
