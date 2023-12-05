@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000
 const ytdl = require('ytdl-core')
 const axios = require('axios')
 const fs = require('fs')
+const { log } = require('console')
 const exec = require('child_process').exec
 
 app.use(cors())
@@ -56,29 +57,34 @@ app.post('/', async (req, res) => {
     const audioPath = `MusicasPostadas/${uid}/${audioFilename}`
     const thumbnailPath = `MusicasPostadas/${uid}/${thumbnailFilename}`
 
-    await Promise.all([
-      downloadAudioToFirebase(videoURL, audioOptions, bucket, audioPath),
-      downloadThumbnailToFirebase(videoURL, bucket, thumbnailPath)
-    ])
+    try {
+      await Promise.all([
+        downloadAudioToFirebase(videoURL, audioOptions, bucket, audioPath),
+        downloadThumbnailToFirebase(videoURL, bucket, thumbnailPath)
+      ]).then(() => {
+        const audioPublicUrl = `https://storage.googleapis.com/${bucket.name}/${audioPath}`
 
-    const audioPublicUrl = `https://storage.googleapis.com/${bucket.name}/${audioPath}`
+        addHighResThumbnailToAudio(audioPublicUrl, videoTitle, channelName, audioPath)
 
-    await addHighResThumbnailToAudio(audioPublicUrl, videoTitle, channelName, audioPath)
+        const thumbnailPublicUrl = `https://storage.googleapis.com/${bucket.name}/${thumbnailPath}`
 
-    const thumbnailPublicUrl = `https://storage.googleapis.com/${bucket.name}/${thumbnailPath}`
+        const videoInfo = {
+          videoTitle,
+          channelName,
+          audioUrl: audioPublicUrl,
+          thumbnailUrl: thumbnailPublicUrl,
+          uid: uid
+        }
 
-    const videoInfo = {
-      videoTitle,
-      channelName,
-      audioUrl: audioPublicUrl,
-      thumbnailUrl: thumbnailPublicUrl,
-      uid: uid
+        console.log('InfosVideo');
+        console.log(videoInfo);
+
+        res.json(videoInfo)
+      })
+    } catch (error) {
+      console.log('Erro await Promise.all')
+      console.log(error)
     }
-
-    console.log('InfosVideo');
-    console.log(videoInfo);
-
-    res.json(videoInfo)
   } catch (err) {
     console.error('Erro ao obter informações do vídeo:', err);
     if (err.message.includes('Status code: 410')) {
